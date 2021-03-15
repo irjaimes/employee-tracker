@@ -1,0 +1,31 @@
+{
+  "name": "employee-tracker",
+  "version": "1.0.0",
+  "description": "Application that allows user to keep track of employees, their designated departments, their managers, and their interalation. ",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "migrate": "mysql employeeDB < db/schema.sql",
+    "seed": "mysql employeeDB < db/schema.sql",
+    "db": "mysql employeeDB",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/irjaimes/employee-tracker.git"
+  },
+  "author": "Idzel Jaimes",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/irjaimes/employee-tracker/issues"
+  },
+  "homepage": "https://github.com/irjaimes/employee-tracker#readme",
+  "dependencies": {
+    "console.table": "^0.10.0",
+    "inquirer": "^8.0.0",
+    "mysql2": "^2.2.5"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
+  }
+}
