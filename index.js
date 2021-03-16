@@ -32,9 +32,8 @@ const promptUser = () => {
       "Add Role",
       "Add Department",
       "Update Employee Role",
-
       // BONUS
-      // "Remove Employees",
+      //"Remove Employees",
       // "Add Role",
       // "Remove Role",
       // "Update Employee Manager",
@@ -69,6 +68,10 @@ const promptUser = () => {
           updateEmployee();
           break;
 
+        // case "Delete Employee":
+        //   deleteEmployee();
+        //   break;
+
         case "End":
 
           connection.end();
@@ -80,9 +83,9 @@ const promptUser = () => {
 // Function to display tables
 function queryTable(tableName, queryString) {
 
-  let query = queryString
+  let queryForTable = queryString
 
-  connection.query(query, (err, res) => {
+  connection.query(queryForTable, (err, res) => {
     if (err) throw err;
 
     console.log("==============================================")
@@ -112,6 +115,7 @@ function addEmployee() {
 
 // Get role function
 function getRole() {
+
   let roleTable = `SELECT role.id, role.title FROM role`
 
   connection.query(roleTable, (err, res) => {
@@ -160,14 +164,15 @@ function promptAddEmployee(roleChoices) {
     .then((answer) => {
       console.log(answer)
       try {
-        var query = connection.query('INSERT INTO employee SET ?', answer,
-          (error, results, fields) => {
+        let query = 'INSERT INTO employee SET ?'
+        connection.query(query, answer, (error, results, fields) => {
             if (error) throw error;
           });
         //console.log(query.sql)
 
         // Update table and display
-        updateTable = 'SELECT * FROM employee'
+        let updateTable = 'SELECT * FROM employee'
+
         connection.query(updateTable, (err, res) => {
           console.table(res);
         });
@@ -180,7 +185,8 @@ function promptAddEmployee(roleChoices) {
 }
 
 function updateEmployee() {
-  var employeeTable = 'SELECT * FROM employee'
+  let employeeTable = 'SELECT * FROM employee'
+
   connection.query(employeeTable, function (err, res) {
     console.table(res);
   });
@@ -204,11 +210,15 @@ function updateEmployee() {
   ]).then((answer) => {
     console.log(answer);
 
-    connection.query(`UPDATE employee SET role_id='${answer.role_id}' WHERE id='${answer.id}'`)
-    //if (err) throw err;
+    let updateQuery = `UPDATE employee SET role_id='${answer.role_id}' WHERE id='${answer.id}'`
 
+    connection.query(updateQuery, (err, res) => {
+      if (err) throw err;
+    })
+    
     // Update table and display
-    updateTable = 'SELECT * FROM employee'
+    let updateTable = 'SELECT * FROM employee'
+
     connection.query(updateTable, (err, res) => {
       console.table(res);
 
@@ -217,105 +227,139 @@ function updateEmployee() {
   })
 }
 
+// function deleteEmployee() {
+//   var employeeTable = 'SELECT * FROM employee'
+//   connection.query(employeeTable, function (err, res) {
+//     console.table(res);
+//   });
+//   inquirer.prompt([
+//     {
+//       type: 'input',
+//       name: 'id',
+//       message: 'Please enter the employee id you wish to DELETE: '
+//     },
+//     {
+//       type: 'confirm',
+//       name: 'id',
+//       message: 'Are you sure you want to delete this employee? '
+//     },
+//   ]).then((answer) => {
+//     console.log(answer);
+
+//     let deleteQuery = `DELETE employee WHERE id='${answer.id}'`
+//     connection.query(deleteQuery)
+//     //if (err) throw err;
+
+//     // Update table and display
+//     let updateTable = 'SELECT * FROM employee'
+//     connection.query(updateTable, (err, res) => {
+//       console.table(res);
+
+//     });
+//     promptUser();
+//   })
+// }
+
 //========================= ROLES ============================
 
 // function to add a role
 function addRole() {
-  var roleTable = 'SELECT * FROM role'
-  connection.query(roleTable, (err, res) => {
-    console.table(res);
-  })
+      var roleTable = 'SELECT * FROM role'
+      connection.query(roleTable, (err, res) => {
+        console.table(res);
+      })
 
-  var query = `SELECT department.id, department.name from department`
+      var query = `SELECT department.id, department.name from department`
 
-  connection.query(query, (err, res) => {
-    if (err) throw err;
+      connection.query(query, (err, res) => {
+        if (err) throw err;
 
-    const deptChoices = res.map(({ id, name }) => ({
-      value: id, name: `${id} ${name}`
-    }));
+        const deptChoices = res.map(({ id, name }) => ({
+          value: id, name: `${id} ${name}`
+        }));
 
-    promptAddRole(deptChoices);
-  });
-}
+        promptAddRole(deptChoices);
+      });
+    }
 
 function promptAddRole(deptChoices) {
-  inquirer
-    .prompt([
-      {
-        type: "input",
-        name: "title",
-        message: "Title for role?"
-      },
-      {
-        type: "input",
-        name: "salary",
-        message: "Salary of role?"
-      },
-      {
-        type: "list",
-        name: "department_id",
-        message: "Department of role?",
-        choices: deptChoices
-      },
-    ])
-    .then((answer) => {
-      console.log(answer)
-      try {
-        var query = connection.query('INSERT INTO role SET ?', answer,
-          (error, results, fields) => {
-            if (error) throw error;
+      inquirer
+        .prompt([
+          {
+            type: "input",
+            name: "title",
+            message: "Title for role?"
+          },
+          {
+            type: "input",
+            name: "salary",
+            message: "Salary of role?"
+          },
+          {
+            type: "list",
+            name: "department_id",
+            message: "Department of role?",
+            choices: deptChoices
+          },
+        ])
+        .then((answer) => {
+          console.log(answer)
+          try {
+            var query = connection.query('INSERT INTO role SET ?', answer,
+              (error, results, fields) => {
+                if (error) throw error;
 
-          });
-      }
-      catch (error) {
-        console.log("Role could not be added, please try again!");
-      }
+              });
+          }
+          catch (error) {
+            console.log("Role could not be added, please try again!");
+          }
 
-      promptUser();
-    });
-}
+          promptUser();
+        });
+    }
 
 //========================= DEPARTMENT ============================
 
 // function to add a new department
 function addDepartment() {
 
-  let query = 'SELECT * FROM department'
-  connection.query(query, (err, res) => {
+      let query = 'SELECT * FROM department'
+      connection.query(query, (err, res) => {
 
-    console.table(res);
+        console.table(res);
 
-  });
+      });
 
-  addDeptPrompt();
-}
+      addDeptPrompt();
+    }
 // add department inquiry
 function addDeptPrompt() {
-  inquirer
-    .prompt([
-      {
-        type: "input",
-        name: "name",
-        message: "Department name?"
-      },
-    ])
-    .then((answer) => {
-      console.log(answer)
-      try {
-        var query = connection.query('INSERT INTO department SET ?', answer,
-        (error, results, fields) => {
-          if (error) throw error;
+      inquirer
+        .prompt([
+          {
+            type: "input",
+            name: "name",
+            message: "Department name?"
+          },
+        ])
+        .then((answer) => {
+          console.log(answer)
+          try {
+            var query = connection.query('INSERT INTO department SET ?', answer,
+              (error, results, fields) => {
+                if (error) throw error;
 
+              });
+            //console.log(query.sql); // INSERT INTO posts SET `id` = 1, `title` = 'Hello MySQL'
+          }
+          catch (error) {
+            console.log("Department could not be added, try again");
+          }
+
+          promptUser();
         });
-        //console.log(query.sql); // INSERT INTO posts SET `id` = 1, `title` = 'Hello MySQL'
-      }
-      catch (error) {
-        console.log("Department could not be added, try again");
-      }
-
-      promptUser();
-    });
-}
+    }
 
 //promptUser();
+
